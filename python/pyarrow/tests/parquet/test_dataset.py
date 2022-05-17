@@ -47,6 +47,11 @@ except ImportError:
     pd = tm = None
 
 
+# Marks all of the tests in this module
+# Ignore these with pytest ... -m 'not parquet'
+pytestmark = pytest.mark.parquet
+
+
 @pytest.mark.pandas
 def test_parquet_piece_read(tempdir):
     df = _test_dataframe(1000)
@@ -1542,7 +1547,8 @@ def test_partitioned_dataset(tempdir, use_legacy_dataset):
     })
     table = pa.Table.from_pandas(df)
     pq.write_to_dataset(table, root_path=str(path),
-                        partition_cols=['one', 'two'])
+                        partition_cols=['one', 'two'],
+                        use_legacy_dataset=use_legacy_dataset)
     table = pq.ParquetDataset(
         path, use_legacy_dataset=use_legacy_dataset).read()
     pq.write_table(table, path / "output.parquet")
