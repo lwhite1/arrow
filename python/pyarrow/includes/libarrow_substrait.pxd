@@ -15,12 +15,12 @@
 # specific language governing permissions and limitations
 # under the License.
 
-prefix=@CMAKE_INSTALL_PREFIX@
-includedir=@ARROW_PKG_CONFIG_INCLUDEDIR@
-libdir=@ARROW_PKG_CONFIG_LIBDIR@
+# distutils: language = c++
 
-Name: Apache Arrow Flight testing
-Description: Library for testing Apache Arrow Flight related programs.
-Version: @ARROW_VERSION@
-Requires: arrow-flight arrow-testing
-Libs: -L${libdir} -larrow_flight_testing
+from pyarrow.includes.common cimport *
+from pyarrow.includes.libarrow cimport *
+
+
+cdef extern from "arrow/engine/substrait/util.h" namespace "arrow::engine::substrait" nogil:
+    CResult[shared_ptr[CRecordBatchReader]] ExecuteSerializedPlan(const CBuffer& substrait_buffer)
+    CResult[shared_ptr[CBuffer]] SerializeJsonPlan(const c_string& substrait_json)

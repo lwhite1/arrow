@@ -15,12 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-prefix=@CMAKE_INSTALL_PREFIX@
-includedir=@ARROW_PKG_CONFIG_INCLUDEDIR@
-libdir=@ARROW_PKG_CONFIG_LIBDIR@
-
-Name: Apache Arrow Flight testing
-Description: Library for testing Apache Arrow Flight related programs.
-Version: @ARROW_VERSION@
-Requires: arrow-flight arrow-testing
-Libs: -L${libdir} -larrow_flight_testing
+from pyarrow._substrait import (  # noqa
+    run_query,
+)
