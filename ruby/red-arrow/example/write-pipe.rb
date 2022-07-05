@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+#
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -15,4 +17,21 @@
 # specific language governing permissions and limitations
 # under the License.
 
-arm64v8/ubuntu:impish
+require "arrow"
+
+table = Arrow::Table.new(a: [1, 2, 3],
+                         b: ["a", "b", "c"])
+IO.pipe do |input, output|
+  pid = spawn(RbConfig.ruby, File.join(__dir__, "read-pipe.rb"), in: input)
+  input.close
+  output.singleton_class.__send__(:undef_method, :seek)
+  Gio::RubyOutputStream.open(output) do |gio_output|
+    Arrow::GIOOutputStream.open(gio_output) do |arrow_output|
+      Arrow::RecordBatchStreamWriter.open(arrow_output, table.schema) do |writer|
+        writer.write_table(table)
+      end
+    end
+  end
+  output.close
+  Process.waitpid(pid)
+end
